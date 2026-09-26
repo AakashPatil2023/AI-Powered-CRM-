@@ -1,0 +1,26 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import "./index.css";
+
+import Navbar from "./Nav/Navbar";
+import Home from "./Home/Home";
+import TaskIndex from "./Tasks/Task.index";
+import ProjectIndex from "./Projects/Project.index";
+
+function App() {
+    return (
+        <BrowserRouter>
+
+            <Navbar />
+
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/tasks" element={<TaskIndex />} />
+                <Route path="/projects" element={<ProjectIndex />} />
+            </Routes>
+
+        </BrowserRouter>
+    );
+}
+
+export default App;
