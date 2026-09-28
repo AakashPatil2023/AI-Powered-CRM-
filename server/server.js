@@ -4,6 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const taskRoutes = require("./routes/taskRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/tasks", taskRoutes);
+app.use("/api/projects", projectRoutes);
 
 mongoose
     .connect(process.env.MONGO_URI)
