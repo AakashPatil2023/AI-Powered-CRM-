@@ -54,8 +54,8 @@ const updateProject = async (req, res) => {
         );
 
         if (!project) {
-            return res.status(400).json({
-                message: error.message
+            return res.status(404).json({
+                message: "Project not found"
             });
         }
 

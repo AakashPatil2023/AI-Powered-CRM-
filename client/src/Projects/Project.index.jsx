@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from "react";
 import AddProject from "./Project.AddProject";
+import EditProject from './Project.EditProject';
 
 function formatDisplayDate(value) {
   if (!value) return "";
@@ -27,7 +27,10 @@ function ProjectIndex() {
         const data = await response.json();
         setProjects(
           Array.isArray(data)
-            ? data.map((project) => ({...project, id: project._id || project.id}))
+            ? data.map((project) => ({
+                ...project,
+                id: project._id || project.id,
+              }))
             : [],
         );
       } catch (error) {
@@ -39,14 +42,53 @@ function ProjectIndex() {
   }, []);
 
   const addNewProject = (newProject) => {
-    const projectTOAdd = {
+    const projectToAdd = {
       ...newProject,
       id: newProject._id || newProject.id,
     };
 
-    setProjects((prevProject) => [...prevProject, projectTOAdd]);
+    setProjects((prevProject) => [...prevProject, projectToAdd]);
     setShowAddProject(false);
   };
+
+  const handleEditClick = (project) => {
+    setEditProjectData(project);
+  };
+
+  const editProject = (updatedProject) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project.id === (updatedProject.id || updatedProject._id)
+          ? {
+              ...project,
+              ...updatedProject,
+              id: updatedProject.id || updatedProject._id,
+            }
+          : project,
+      ),
+    );
+    setEditProjectData(null);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/projects/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
+    } catch (error) {
+      console.error("Failed to delete project", error);
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between h-32 px-4">
@@ -57,17 +99,23 @@ function ProjectIndex() {
         >
           Add Project
         </button>
-
-       
       </div>
-       {showAddProject && (
-          <AddProject
-            onAddProject={addNewProject}
-            onClose={() => setShowAddProject(false)}
-          />
-        )}
+      {showAddProject && (
+        <AddProject
+          onAddProject={addNewProject}
+          onClose={() => setShowAddProject(false)}
+        />
+      )}
 
-        <table className="w-full mt-4 border-collapse border text-center border-gray-300">
+      {editProjectData && (
+        <EditProject
+          project={editProjectData}
+          onEditProject={editProject}
+          onClose={() => setEditProjectData(null)}
+        />
+      )}
+
+      <table className="w-full mt-4 border-collapse border text-center border-gray-300">
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 px-4 py-2 text-left">
@@ -87,7 +135,9 @@ function ProjectIndex() {
         <tbody>
           {projects.map((project) => (
             <tr key={project.id} className="hover:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-2">{project.title}</td>
+              <td className="border border-gray-300 px-4 py-2">
+                {project.title}
+              </td>
               <td className="border border-gray-300 px-4 py-2">
                 {project.description}
               </td>
@@ -101,9 +151,12 @@ function ProjectIndex() {
                 >
                   Delete
                 </button>
-                <button onClick={() => handleEditClick(project)} 
+                <button
+                  onClick={() => handleEditClick(project)}
                   data-dialog-target="modal-xl"
-                  className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2" type="button">
+                  className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+                  type="button"
+                >
                   Edit
                 </button>
               </td>
