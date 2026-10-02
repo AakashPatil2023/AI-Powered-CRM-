@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 
 const taskRoutes = require("./routes/taskRoutes");
 const projectRoutes = require("./routes/projectRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/tasks", taskRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/contacts", contactRoutes);
 
 mongoose
     .connect(process.env.MONGO_URI)
